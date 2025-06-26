@@ -1,47 +1,47 @@
 module.exports = (sequelize, DataTypes) => {
-    const TeacherSessionHistory = sequelize.define('TeacherSessionHistory', {
+    const CourseResult = sequelize.define('CourseResult', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        planned_sessions: {
+        score: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        actual_sessions: {
-            type: DataTypes.INTEGER,
-        },
-        real_sessions: {
-            type: DataTypes.INTEGER,
-        },
-        teacher_id: {
+        question_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'teachers',
+                model: 'questions',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+        report_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'courses_reports',
+                key: 'id',
+            },
+            onDelete: 'RESTRICT'
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'teachers_sessions_history',
+        tableName: 'courses_results',
         timestamps: true,
         updatedAt: false,
     });
 
-    TeacherSessionHistory.associate = (models) => {
-        TeacherSessionHistory.belongsTo(models.Teacher, { foreignKey: 'teacher_id', as: 'teacher' });
+    CourseResult.associate = (models) => {
+        CourseResult.belongsTo(models.Question, { foreignKey: 'question_id', as: 'question' });
+        CourseResult.belongsTo(models.CourseReport, { foreignKey: 'report_id', as: 'report' });
     };
 
-    return TeacherSessionHistory;
+    return CourseResult;
 }

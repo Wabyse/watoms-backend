@@ -6,11 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        en_name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        ar_name: {
+        name: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -22,11 +18,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         type: {
-            type: DataTypes.ENUM('360 Individual Assessment', 'ClassRoom Observation', '360 Curriculum Assessment', 'normal', 'curriculum', 'normal2')
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+            type: DataTypes.ENUM('individual', 'curriculum', 'environment', 'course', 'facility')
         },
         deletedAt: {
             type: DataTypes.DATE,

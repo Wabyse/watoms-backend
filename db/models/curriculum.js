@@ -14,18 +14,14 @@ module.exports = (sequelize, DataTypes) => {
         no_of_units: {
             type: DataTypes.INTEGER
         },
-        subject_id: {
+        course_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'subjects',
+                model: 'courses',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
@@ -38,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Curriculum.associate = (models) => {
-        Curriculum.belongsTo(models.Subject, { foreignKey: 'subject_id', as: 'subject' });
+        Curriculum.belongsTo(models.Course, { foreignKey: 'course_id', as: 'course' });
         Curriculum.hasMany(models.CurriculumReport, { foreignKey: 'curriculum_id', as: 'reports' });
         Curriculum.hasMany(models.CurriculumUnit, { foreignKey: 'curriculum_id', as: 'units' });
     };

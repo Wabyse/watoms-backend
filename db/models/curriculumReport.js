@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        Assessor_id: {
+        user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -33,10 +33,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT',
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -49,9 +45,9 @@ module.exports = (sequelize, DataTypes) => {
 
     CurriculumReport.associate = (models) => {
         CurriculumReport.belongsTo(models.Curriculum, { foreignKey: 'curriculum_id', as: 'curriculum' });
-        CurriculumReport.belongsTo(models.User, { foreignKey: 'Assessor_id', as: 'assessor' });
-        CurriculumReport.hasMany(models.CurriculumResult, { foreignKey: 'report_id', as: 'results' });
+        CurriculumReport.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
         CurriculumReport.belongsTo(models.Organization, { foreignKey: 'organization_id', as: 'organization' });
+        CurriculumReport.hasMany(models.CurriculumResult, { foreignKey: 'report_id', as: 'results' });
     };
 
     return CurriculumReport;

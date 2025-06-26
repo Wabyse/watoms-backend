@@ -6,11 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        en_name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        ar_name: {
+        name: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -29,10 +25,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,

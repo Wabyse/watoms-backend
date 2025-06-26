@@ -10,20 +10,20 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        teacher_id: {
+        trainer_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'teachers',
+                model: 'trainers',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
         },
-        student_id: {
+        trainee_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'students',
+                model: 'trainees',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
@@ -37,10 +37,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -52,8 +48,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     QuizTest.associate = (models) => {
-        QuizTest.belongsTo(models.Teacher, { foreignKey: 'teacher_id', as: 'teacher' });
-        QuizTest.belongsTo(models.Student, { foreignKey: 'student_id', as: 'student' });
+        QuizTest.belongsTo(models.Trainer, { foreignKey: 'trainer_id', as: 'trainer' });
+        QuizTest.belongsTo(models.Trainee, { foreignKey: 'trainee_id', as: 'trainee' });
         QuizTest.belongsTo(models.QuizzesTestsTemplate, { foreignKey: 'template_id', as: 'template' });
     };
 

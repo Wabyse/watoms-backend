@@ -2,16 +2,15 @@ const path = require("path");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
 const {
-  SchoolDocument,
-  Department,
+  Document,
   Organization,
   DocCategory,
   DocSubCategory,
   User,
   Employee,
   EmployeeRole,
-  Teacher,
-  Subject
+  Trainer,
+  Course,
 } = require("../db/models");
 
 // Upload File
@@ -20,21 +19,21 @@ exports.uploadFile = async (req, res) => {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
-  const { department_id, organization_id, user_id, sub_category } = req.body;
+  const { organization_id, user_id, sub_category_id } = req.body;
 
-  if (!department_id || !organization_id || !user_id || !sub_category) {
+  if (!organization_id || !user_id || !sub_category_id) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  //need to add folder inside uploads for each organization
   const filePath = `uploads/${req.file.filename}`; // Always stores with forward slashes
 
   try {
-    const file = await SchoolDocument.create({
+    const file = await Document.create({
       file_path: filePath,
-      department_id,
-      organization_id,
+      sub_category_id,
       user_id,
-      sub_category,
+      organization_id,
     });
 
     res.json({
@@ -72,7 +71,7 @@ exports.downloadFile = (req, res) => {
 // View Files
 exports.viewFiles = async (req, res) => {
   try {
-    const files = await SchoolDocument.findAll({
+    const files = await Document.findAll({
       attributes: ["id", "file_path", "createdAt"],
       include: [
         {
@@ -83,7 +82,7 @@ exports.viewFiles = async (req, res) => {
           include: [
             {
               model: DocCategory,
-              as: "documentCategory",
+              as: "document_category",
               required: true,
               attributes: ["id", "name"],
             },
@@ -114,19 +113,14 @@ exports.viewFiles = async (req, res) => {
                   attributes: ["id", "name", "type"],
                 },
                 {
-                  model: Teacher,
-                  as: "teacher",
+                  model: Trainer,
+                  as: "trainer",
                   required: false,
                   attributes: ["id"],
                   include: [
                     {
-                      model: Department,
-                      as: "department",
-                      required: false,
-                      attributes: ["id", "Name"],
-                    }, {
-                      model: Subject,
-                      as: "subject",
+                      model: Course,
+                      as: "course",
                       required: false,
                       attributes: ["id", "name"],
                     },
@@ -135,12 +129,6 @@ exports.viewFiles = async (req, res) => {
               ],
             },
           ],
-        },
-        {
-          model: Department,
-          as: "department",
-          required: true,
-          attributes: ["id", "Name"],
         },
         {
           model: Organization,
@@ -221,7 +209,7 @@ exports.viewCategories = async (req, res) => {
       include: [
         {
           model: DocSubCategory,
-          as: "subCategory",
+          as: "sub_category",
           required: true,
           attributes: ["id", "name"],
         },

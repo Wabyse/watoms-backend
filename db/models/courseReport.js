@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const EnvironmentReport = sequelize.define('EnvironmentReport', {
+    const CourseReport = sequelize.define('CourseReport', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -13,13 +13,13 @@ module.exports = (sequelize, DataTypes) => {
                 model: 'users',
                 key: 'id',
             },
-            onDelete: 'RESTRICT'
+            onDelete: 'RESTRICT',
         },
-        organization_id: {
+        course_offering_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'organizations',
+                model: 'course_offerings',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
@@ -29,16 +29,16 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {
         paranoid: true,
-        tableName: 'environment_reports',
+        tableName: 'courses_reports',
         timestamps: true,
         updatedAt: false,
     });
 
-    EnvironmentReport.associate = (models) => {
-        EnvironmentReport.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
-        EnvironmentReport.hasMany(models.EnvironmentResult, { foreignKey: 'report_id', as: 'results' });
-        EnvironmentReport.belongsTo(models.Organization, { foreignKey: 'organization_id', as: 'organization' });
+    CourseReport.associate = (models) => {
+        CourseReport.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
+        CourseReport.belongsTo(models.CourseOffering, { foreignKey: 'course_offering_id', as: 'course' });
+        CourseReport.hasMany(models.CourseResult, { foreignKey: 'report_id', as: 'results' });
     };
 
-    return EnvironmentReport;
+    return CourseReport;
 }

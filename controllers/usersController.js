@@ -1,26 +1,20 @@
 const {
   User,
   Employee,
-  Teacher,
-  Session,
-  Class,
-  Substitute,
-  TeacherLatness,
-  Student,
-  studentAttendance,
-  Stage,
+  Trainer,
+  TrainerLatness,
+  Trainee,
+  TraineeAttendance,
   Organization,
   Incident,
   IncidentCategories,
   IncidentSubCategory,
-  studentBehaviorType,
-  studentBehaviorCategory,
-  studentBehavior,
-  EmployeeCheckInOut
+  EmployeeCheckInOut,
+  Course
 } = require("../db/models");
 const path = require("path");
 
-exports.viewSchoolEmployees = async (req, res) => {
+exports.viewEmployees = async (req, res) => {
   try {
     const Users = await User.findAll({
       attributes: ["id", "code"],
@@ -30,21 +24,18 @@ exports.viewSchoolEmployees = async (req, res) => {
           as: "employee",
           required: true,
           attributes: ["id", "first_name", "middle_name", "last_name", "organization_id"],
-          where: {
-            organization_id: [1, 2],
-          },
           include: [
             {
-              model: Teacher,
-              as: "teacher",
-              required: false, // allow null = LEFT OUTER JOIN
+              model: Trainer,
+              as: "trainer",
+              required: false, // allow null
               attributes: ["id"],
             },
           ],
         },
       ],
       where: {
-        '$employee.teacher.id$': null, // only users where employee has no teacher
+        '$employee.trainer.id$': null, // only users where employee has no teacher
       },
     });
 
@@ -58,45 +49,7 @@ exports.viewSchoolEmployees = async (req, res) => {
   }
 };
 
-exports.viewVtcEmployees = async (req, res) => {
-  try {
-    const Users = await User.findAll({
-      attributes: ["id", "code"],
-      include: [
-        {
-          model: Employee,
-          as: "employee",
-          required: true,
-          attributes: ["id", "first_name", "middle_name", "last_name", "organization_id"],
-          where: {
-            organization_id: [4, 5, 7, 8, 9],
-          },
-          include: [
-            {
-              model: Teacher,
-              as: "teacher",
-              required: false, // allow null = LEFT OUTER JOIN
-              attributes: ["id"],
-            },
-          ],
-        },
-      ],
-      where: {
-        '$employee.teacher.id$': null, // only users where employee has no teacher
-      },
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "data got fetched successfully",
-      Users,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-exports.viewTeacher = async (req, res) => {
+exports.viewTrainer = async (req, res) => {
   try {
     const { id } = req.body;
 
@@ -111,21 +64,14 @@ exports.viewTeacher = async (req, res) => {
           attributes: ["id", "first_name", "middle_name", "last_name", "organization_id"],
           include: [
             {
-              model: Teacher,
-              as: "teacher",
-              attributes: ["id"],
+              model: Trainer,
+              as: "trainer",
+              attributes: ["id", "type"],
               include: [
                 {
-                  model: Session,
-                  as: "sessions",
-                  attributes: ["id"],
-                  include: [
-                    {
-                      model: Class,
-                      as: "class",
-                      attributes: ["id", "name"],
-                    },
-                  ],
+                  model: Course,
+                  as: "courses",
+                  attributes: ["id", "name"],
                 },
               ],
             },
@@ -144,7 +90,7 @@ exports.viewTeacher = async (req, res) => {
   }
 };
 
-exports.viewTeachers = async (req, res) => {
+exports.viewTrainers = async (req, res) => {
   try {
     const Users = await User.findAll({
       attributes: ["id", "code"],
@@ -156,8 +102,8 @@ exports.viewTeachers = async (req, res) => {
           attributes: ["id", "first_name", "middle_name", "last_name", "organization_id"],
           include: [
             {
-              model: Teacher,
-              as: "teacher",
+              model: Trainer,
+              as: "trainer",
               required: true,
               attributes: ["id"],
             },
@@ -176,31 +122,7 @@ exports.viewTeachers = async (req, res) => {
   }
 };
 
-exports.submitSubstitutions = async (req, res) => {
-  try {
-    const substitutionsData = req.body;
-
-    if (!Array.isArray(substitutionsData) || substitutionsData.length === 0) {
-      return res.status(400).json({ message: "Invalid or empty data array." });
-    }
-
-    const addSubstitutions = await Substitute.bulkCreate(substitutionsData, {
-      validate: true,
-      returning: true,
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "Substitutions created successfully",
-      data: addSubstitutions,
-    });
-  } catch (error) {
-    console.error("Error creating substitutions:", error);
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-exports.submitTeacherLatness = async (req, res) => {
+exports.submitTrainerLatness = async (req, res) => {
   try {
     const LatnessData = req.body;
 
@@ -208,14 +130,14 @@ exports.submitTeacherLatness = async (req, res) => {
       return res.status(400).json({ message: "Invalid or empty data array." });
     }
 
-    const addLatness = await TeacherLatness.bulkCreate(LatnessData, {
+    const addLatness = await TrainerLatness.bulkCreate(LatnessData, {
       validate: true,
       returning: true,
     });
 
     res.status(200).json({
       status: "success",
-      message: "Teacher latness data created successfully",
+      message: "Trainer latness data created successfully",
       data: addLatness,
     });
   } catch (error) {
@@ -224,31 +146,31 @@ exports.submitTeacherLatness = async (req, res) => {
   }
 };
 
-exports.viewStudents = async (req, res) => {
+exports.viewTrainees = async (req, res) => {
   try {
-    const students = await Student.findAll({
+    const trainees = await Trainee.findAll({
       attributes: [
         "id",
         "first_name",
         "middle_name",
         "last_name",
         "user_id",
-        "class_id",
-        "school_id",
+        "course_offering_id",
+        "organization_id",
       ],
     });
 
     res.status(200).json({
       status: "success",
       message: "data got fetched successfully",
-      students,
+      trainees,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
 
-exports.submitStudentAbsence = async (req, res) => {
+exports.submitTraineeAbsence = async (req, res) => {
   try {
     const AbsenceData = req.body;
 
@@ -256,14 +178,14 @@ exports.submitStudentAbsence = async (req, res) => {
       return res.status(400).json({ message: "Invalid or empty data array." });
     }
 
-    const addAttendance = await studentAttendance.bulkCreate(AbsenceData, {
+    const addAttendance = await TraineeAttendance.bulkCreate(AbsenceData, {
       validate: true,
       returning: true,
     });
 
     res.status(200).json({
       status: "success",
-      message: "Student Absence data created successfully",
+      message: "Trainees Absence data created successfully",
       data: addAttendance,
     });
   } catch (error) {
@@ -272,62 +194,12 @@ exports.submitStudentAbsence = async (req, res) => {
   }
 };
 
-exports.viewClasses = async (req, res) => {
-  try {
-    const students = await Class.findAll({
-      attributes: ["id", "name", "stage_id", "classRoom_id"],
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "data got fetched successfully",
-      students,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-exports.viewStages = async (req, res) => {
-  try {
-    const students = await Stage.findAll({
-      attributes: ["id", "name"],
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "data got fetched successfully",
-      students,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-exports.viewSchools = async (req, res) => {
-  try {
-    const schools = await Organization.findAll({
-      attributes: ["id", "name"],
-      where: { type: "school" },
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "data got fetched successfully",
-      schools,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
 exports.submitIncident = async (req, res) => {
   try {
-    const { comment, location, school_id, sub_category, incident_date } =
+    const { comment, location, institution_id, sub_category_id, incident_date } =
       req.body;
 
-    // Check for missing fields
-    if (!school_id || !incident_date || !sub_category) {
+    if (!institution_id || !incident_date || !sub_category_id) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -337,13 +209,12 @@ exports.submitIncident = async (req, res) => {
       file_path = path.join("uploads", req.file.filename);
     }
 
-    // Create task
     const addIncident = await Incident.create({
       comment,
       location,
       file_path, // Will be null if no file is uploaded
-      school_id,
-      sub_category,
+      institution_id,
+      sub_category_id,
       incident_date,
     });
 
@@ -365,57 +236,6 @@ exports.viewIncidentsCategories = async (req, res) => {
         {
           model: IncidentSubCategory,
           as: "incidentSubCategories",
-          required: true,
-          attributes: ["id", "name"],
-        },
-      ],
-    });
-    res.status(200).json({
-      status: "success",
-      message: "data got fetched successfully",
-      categories,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-exports.submitBehavior = async (req, res) => {
-  try {
-    const { comment, offender_id, social_worker_id, type, behavior_date } =
-      req.body;
-
-    // Check for missing fields
-    if (!offender_id || !social_worker_id || !type || !behavior_date) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const addBehavior = await studentBehavior.create({
-      comment,
-      offender_id,
-      social_worker_id,
-      type,
-      behavior_date,
-    });
-
-    res.status(201).json({
-      message: "behavior assigned successfully",
-      incident: addBehavior,
-    });
-  } catch (error) {
-    console.error("Sequelize Validation Error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-exports.viewBehaviorCategories = async (req, res) => {
-  try {
-    const categories = await studentBehaviorCategory.findAll({
-      attributes: ["id", "name"],
-      include: [
-        {
-          model: studentBehaviorType,
-          as: "behaviorType",
           required: true,
           attributes: ["id", "name"],
         },

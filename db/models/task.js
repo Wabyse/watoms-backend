@@ -21,13 +21,13 @@ module.exports = (sequelize, DataTypes) => {
         },
         status: {
             allowNull: false,
-            type: DataTypes.ENUM('0', '25', '50', '75', 'finished', 'on hold', 'in progress', 'past the due date', 'submitted', 'under review', 'not started yet'),
+            type: DataTypes.ENUM('not started yet', 'in progress', '25', '50', '75', 'finished', 'submitted', 'on hold', 'past the due date', 'under review'),
         },
         importance: {
             allowNull: false,
             type: DataTypes.ENUM('normal', 'important', 'urgent'),
         },
-        sub_category: {
+        sub_category_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        assignedBy_id: {
+        assignedby_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -57,12 +57,8 @@ module.exports = (sequelize, DataTypes) => {
         file_path: {
             type: DataTypes.TEXT
         },
-        submit_file_path: {
+        submitted_file_path: {
             type: DataTypes.TEXT
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
@@ -74,8 +70,8 @@ module.exports = (sequelize, DataTypes) => {
     });
     
     Task.associate = (models) => {
-        Task.belongsTo(models.TaskSubCategory, { foreignKey: 'sub_category', as: 'taskSubCategory' });
-        Task.belongsTo(models.Employee, { foreignKey: 'assignedBy_id', as: 'assigner' });
+        Task.belongsTo(models.TaskSubCategory, { foreignKey: 'sub_category_id', as: 'taskSubCategory' });
+        Task.belongsTo(models.Employee, { foreignKey: 'assignedby_id', as: 'assigner' });
         Task.belongsTo(models.Employee, { foreignKey: 'assignee_id', as: 'assignee' });
     };
 

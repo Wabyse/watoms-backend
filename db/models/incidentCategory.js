@@ -10,10 +10,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -25,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     
     IncidentCategories.associate = (models) => {
-        IncidentCategories.hasMany(models.IncidentSubCategory, { foreignKey: 'category', as: 'incidentSubCategories' });
+        IncidentCategories.hasMany(models.IncidentSubCategory, { foreignKey: 'category_id', as: 'incidentSubCategories' });
     };
 
     return IncidentCategories;

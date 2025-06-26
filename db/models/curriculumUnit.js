@@ -11,17 +11,17 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         status: {
-            type: DataTypes.ENUM('ongoing', 'done', 'overdue', 'terminated', 'not started yet', 'in progress'),
+            type: DataTypes.ENUM('not started yet', 'ongoing', 'done', 'overdue', 'terminated'),
             allowNull: false,
         },
         deadline: {
             type: DataTypes.DATEONLY
         },
-        session_id: {
+        course_offering_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'sessions',
+                model: 'course_offerings',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
@@ -35,10 +35,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -49,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     CurriculumUnit.associate = (models) => {
-        CurriculumUnit.belongsTo(models.Session, { foreignKey: 'session_id', as: 'session' });
+        CurriculumUnit.belongsTo(models.CourseOffering, { foreignKey: 'course_offering_id', as: 'course' });
         CurriculumUnit.belongsTo(models.Curriculum, { foreignKey: 'curriculum_id', as: 'curriculum' });
     };
 

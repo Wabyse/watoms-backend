@@ -1,43 +1,39 @@
 module.exports = (sequelize, DataTypes) => {
-    const EmployeeAbsence = sequelize.define('EmployeeAbsence', {
+    const TraineeAttendance = sequelize.define('TraineeAttendance', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        comment: {
+        reason: {
             type: DataTypes.TEXT,
         },
         status: {
             allowNull: false,
-            type: DataTypes.ENUM('absent', 'excused'),
+            type: DataTypes.ENUM('absent', 'attend', 'late', 'excused'),
         },
-        employee_id: {
+        trainee_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'employees',
+                model: 'trainees',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'employees_absence',
+        tableName: 'trainees_attendance',
         timestamps: true,
     });
-        
-    EmployeeAbsence.associate = (models) => {
-        EmployeeAbsence.belongsTo(models.Employee, { foreignKey: 'employee_id', as: 'employee' });
+
+    TraineeAttendance.associate = (models) => {
+        TraineeAttendance.belongsTo(models.Trainee, { foreignKey: 'trainee_id', as: 'trainee' });
     };
 
-    return EmployeeAbsence;
+    return TraineeAttendance;
 }

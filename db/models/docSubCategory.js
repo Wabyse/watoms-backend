@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        category: {
+        category_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
@@ -34,8 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     DocSubCategory.associate = (models) => {
-        DocSubCategory.belongsTo(models.DocCategory, { foreignKey: 'category', as: 'documentCategory' });
-        DocSubCategory.hasMany(models.SchoolDocument, { foreignKey: 'sub_category', as: 'documents' });
+        DocSubCategory.belongsTo(models.DocCategory, { foreignKey: 'category_id', as: 'document_category' });
+        DocSubCategory.hasMany(models.Document, { foreignKey: 'sub_category_id', as: 'documents' });
     };
 
     return DocSubCategory;

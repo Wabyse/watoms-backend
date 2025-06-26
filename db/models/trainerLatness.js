@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const TeacherLatness = sequelize.define('TeacherLatness', {
+    const TrainerLatness = sequelize.define('TrainerLatness', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -13,42 +13,38 @@ module.exports = (sequelize, DataTypes) => {
         reason: {
             type: DataTypes.TEXT
         },
-        teacher_id: {
+        trainer_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'teachers',
+                model: 'trainers',
                 key: 'id',
             },
             onDelete: "RESTRICT",
         },
-        session_id: {
+        courseOffering_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'sessions',
+                model: 'course_offerings',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'teacher_latness',
+        tableName: 'trainers_latness',
         timestamps: true,
         updatedAt: false,
     });
 
-    TeacherLatness.associate = (models) => {
-        TeacherLatness.belongsTo(models.Teacher, { foreignKey: 'teacher_id', as: 'teacher' });
-        TeacherLatness.belongsTo(models.Session, { foreignKey: 'session_id', as: 'session' });
+    TrainerLatness.associate = (models) => {
+        TrainerLatness.belongsTo(models.Trainer, { foreignKey: 'trainer_id', as: 'trainer' });
+        TrainerLatness.belongsTo(models.CourseOffering, { foreignKey: 'course_offering_id', as: 'course_offering' });
     };
 
-    return TeacherLatness;
+    return TrainerLatness;
 }

@@ -6,11 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        en_name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        ar_name: {
+        name: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -39,10 +35,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -55,10 +47,12 @@ module.exports = (sequelize, DataTypes) => {
 
     Question.associate = (models) => {
         Question.belongsTo(models.SubField, { foreignKey: 'sub_field_id', as: 'sub_field' });
-        Question.hasMany(models.CurriculumResult, { foreignKey: 'question_id', as: 'currResults' });
-        Question.hasMany(models.QuestionResult, { foreignKey: 'question_id', as: 'quesResults' });
-        Question.hasMany(models.EnvironmentResults, { foreignKey: 'question_id', as: 'envResults' });
         Question.belongsTo(models.QuestionManifest, { foreignKey: 'manifest_code', as: 'questions' });
+        Question.hasMany(models.IndividualResult, { foreignKey: 'question_id', as: 'individual_results' });
+        Question.hasMany(models.CurriculumResult, { foreignKey: 'question_id', as: 'curriculum_results' });
+        Question.hasMany(models.EnvironmentResult, { foreignKey: 'question_id', as: 'environment_results' });
+        Question.hasMany(models.CourseResult, { foreignKey: 'question_id', as: 'course_results' });
+        Question.hasMany(models.FacilityResult, { foreignKey: 'question_id', as: 'facility_results' });
     };
 
     return Question;

@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const QuestionResult = sequelize.define('QuestionResult', {
+    const FacilityResult = sequelize.define('FacilityResult', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -23,29 +23,25 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'individual_reports',
+                model: 'facilities_reports',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'questions_results',
+        tableName: 'facilities_results',
         timestamps: true,
         updatedAt: false,
     });
 
-    QuestionResult.associate = (models) => {
-        QuestionResult.belongsTo(models.Question, { foreignKey: 'question_id', as: 'question' });
-        QuestionResult.belongsTo(models.IndividualReport, { foreignKey: 'report_id', as: 'report' });
+    FacilityResult.associate = (models) => {
+        FacilityResult.belongsTo(models.Question, { foreignKey: 'question_id', as: 'question' });
+        FacilityResult.belongsTo(models.FacilityReport, { foreignKey: 'report_id', as: 'report' });
     };
 
-    return QuestionResult;
+    return FacilityResult;
 }

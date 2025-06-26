@@ -1,16 +1,12 @@
 require("dotenv").config({ path: `${process.cwd()}/.env` });
 const express = require("express");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const cors = require("cors"); //to let a front end uses the apis
+const cors = require("cors"); //to let a front-end project uses the apis
 const authRoutes = require("./routes/authRoutes");
 const formRoutes = require("./routes/formRoutes");
 const filesRoutes = require("./routes/filesRoutes");
 const tasksRoutes = require("./routes/tasksRoutes");
 const usersRoutes = require("./routes/usersRoutes");
-const teachersRoutes = require("./routes/teachersRoutes");
-const neqatyRoutes = require("./routes/neqatyRoutes");
+const trainersRoutes = require("./routes/trainersRoutes");
 const dataRoutes = require("./routes/dataRoutes");
 const errorHandler = require("./middleware/errorMiddleware");
 const { sequelize } = require("./db/models");
@@ -19,7 +15,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.FRONT_BASEURL || "http://localhost:3000",
+    origin: process.env.FRONT_BASEURL || "http://localhost:3001",
   })
 );
 
@@ -28,12 +24,10 @@ app.use(express.urlencoded({ extended: true })); //parses URL-encoded data from 
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/forms", formRoutes);
-// app.use("/api/v1/users", formRoutes);
 app.use("/api/v1/files", filesRoutes);
 app.use("/api/v1/tasks", tasksRoutes);
 app.use("/api/v1/users", usersRoutes);
-app.use("/api/v1/teachers", teachersRoutes);
-app.use("/api/v1/neqaty", neqatyRoutes);
+app.use("/api/v1/teachers", trainersRoutes);
 app.use("/api/v1/data", dataRoutes);
 
 app.use("*", (req, res) => {

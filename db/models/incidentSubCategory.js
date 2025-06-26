@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        category: {
+        category_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
@@ -34,8 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     IncidentSubCategory.associate = (models) => {
-        IncidentSubCategory.hasMany(models.Incident, { foreignKey: 'sub_category', as: 'incidents' });
-        IncidentSubCategory.belongsTo(models.IncidentCategories, { foreignKey: 'category', as: 'incidentCategory' });
+        IncidentSubCategory.belongsTo(models.IncidentCategories, { foreignKey: 'category_id', as: 'incidentCategory' });
+        IncidentSubCategory.hasMany(models.Incident, { foreignKey: 'sub_category_id', as: 'incidents' });
     };
 
     return IncidentSubCategory;

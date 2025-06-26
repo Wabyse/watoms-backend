@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        Assessor_id: {
+        assessor_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        Assessee_id: {
+        assessee_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -23,10 +23,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
@@ -39,9 +35,9 @@ module.exports = (sequelize, DataTypes) => {
     });
     
     IndividualReport.associate = (models) => {
-        IndividualReport.belongsTo(models.User, { foreignKey: 'Assessor_id', as: 'assessor' });
-        IndividualReport.belongsTo(models.User, { foreignKey: 'Assessee_id', as: 'assessee' });
-        IndividualReport.hasMany(models.QuestionResult, { foreignKey: 'report_id', as: 'results' });
+        IndividualReport.belongsTo(models.User, { foreignKey: 'assessor_id', as: 'assessor' });
+        IndividualReport.belongsTo(models.User, { foreignKey: 'assessee_id', as: 'assessee' });
+        IndividualReport.hasMany(models.IndividualResult, { foreignKey: 'report_id', as: 'results' });
     };
     
     return IndividualReport;

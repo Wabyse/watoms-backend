@@ -1,33 +1,32 @@
 module.exports = (sequelize, DataTypes) => {
-    const Department = sequelize.define('Department', {
+    const Facility = sequelize.define('Facility', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        Name: {
+        name: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
+        type: {
+            type: DataTypes.ENUM('lab', 'workshop', 'class')
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'departments',
+        tableName: 'facilities',
         timestamps: true,
         updatedAt: false,
     });
 
-    Department.associate = (models) => {
-        Department.hasMany(models.Teacher, { foreignKey: 'department_id', as: 'teachers' });
-        Department.hasMany(models.SchoolDocument, { foreignKey: 'department_id', as: 'documents' });
+    Facility.associate = (models) => {
+        Facility.hasMany(models.CourseOffering, { foreignKey: 'facility_id', as: 'courses' });
+        Facility.hasMany(models.FacilityReport, { foreignKey: 'facility_id', as: 'reports' });
     };
 
-    return Department;
+    return Facility;
 }

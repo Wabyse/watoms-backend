@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const EnvironmentResults = sequelize.define('EnvironmentResults', {
+    const EnvironmentResult = sequelize.define('EnvironmentResult', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -28,10 +28,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -42,10 +38,10 @@ module.exports = (sequelize, DataTypes) => {
         updatedAt: false,
     });
 
-    EnvironmentResults.associate = (models) => {
-        EnvironmentResults.belongsTo(models.Question, { foreignKey: 'question_id', as: 'questionResult' });
-        EnvironmentResults.belongsTo(models.EnvironmentReports, { foreignKey: 'report_id', as: 'report' });
+    EnvironmentResult.associate = (models) => {
+        EnvironmentResult.belongsTo(models.Question, { foreignKey: 'question_id', as: 'question' });
+        EnvironmentResult.belongsTo(models.EnvironmentReport, { foreignKey: 'report_id', as: 'report' });
     };
 
-    return EnvironmentResults;
+    return EnvironmentResult;
 }

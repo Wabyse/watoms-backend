@@ -1,111 +1,85 @@
 module.exports = (sequelize, DataTypes) => {
-    const School = sequelize.define('School', {
+    const InstitutionStructureHistory = sequelize.define('InstitutionStructureHistory', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        no_of_theaters: {
+        actual_no_of_security_cameras: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_security_cameras: {
+        actual_no_of_emergency_exits: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_emergency_exits: {
+        actual_no_of_fire_extinguishers: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_fire_extinguishers: {
+        actual_no_of_sand_buckets: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_clinics: {
+        actual_no_of_offices: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_sand_buckets: {
+        actual_no_of_toilets: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_classes: {
+        actual_no_of_stores: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_offices: {
+        actual_no_of_gates: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_toilets: {
+        actual_no_of_classes: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_stores: {
+        actual_no_of_buildings: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_gates: {
+        actual_no_of_labs: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_security_rooms: {
+        actual_no_of_workshops: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_admin_rooms: {
+        actual_no_of_meeting_rooms: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        no_of_buildings: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        no_of_libraries: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        no_of_labs: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        no_of_workshops: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        no_of_meeting_rooms: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        organizationId: {
+        institution_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'organizations',
+                model: 'institutions',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'schools',
+        tableName: 'institutions_structure_history',
         timestamps: true,
         updatedAt: false,
     });
 
-    School.associate = (models) => {
-        School.hasMany(models.Incident, { foreignKey: 'school_id', as: 'incidents' });
-        School.hasMany(models.SchoolStructureHistory, { foreignKey: 'schoolId', as: 'structures' });
-        School.belongsTo(models.Organization, { foreignKey: 'organizationId', as: 'org' });
+    InstitutionStructureHistory.associate = (models) => {
+        InstitutionStructureHistory.belongsTo(models.Institution, { foreignKey: 'institution_id', as: 'institution' });
     };
 
-    return School;
+    return InstitutionStructureHistory;
 }

@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const TeacherEvaluation = sequelize.define('TeacherEvaluation', {
+    const TrainerEvaluation = sequelize.define('TrainerEvaluation', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -15,11 +15,11 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        teacher_id: {
+        trainer_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'teachers',
+                model: 'trainers',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
@@ -52,23 +52,19 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'teacher_evaluation',
+        tableName: 'trainers_evaluation',
         timestamps: true,
     });
     
-    TeacherEvaluation.associate = (models) => {
-        TeacherEvaluation.belongsTo(models.Employee, { foreignKey: 'employee_id', as: 'employee' });
-        TeacherEvaluation.belongsTo(models.Teacher, { foreignKey: 'teacher_id', as: 'teacher' });
+    TrainerEvaluation.associate = (models) => {
+        TrainerEvaluation.belongsTo(models.Employee, { foreignKey: 'employee_id', as: 'employee' });
+        TrainerEvaluation.belongsTo(models.Trainer, { foreignKey: 'trainer_id', as: 'trainer' });
     };
 
-    return TeacherEvaluation;
+    return TrainerEvaluation;
 }

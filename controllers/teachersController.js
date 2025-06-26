@@ -4,7 +4,7 @@ exports.submitEvaluation = async (req, res) => {
   try {
     const {
       type,
-      teacher_id,
+      trainer_id,
       employee_id,
       first_result,
       second_result,
@@ -16,7 +16,7 @@ exports.submitEvaluation = async (req, res) => {
 
     if (
       !type ||
-      !teacher_id ||
+      !trainer_id ||
       !employee_id ||
       !first_result ||
       !second_result ||
@@ -33,7 +33,7 @@ exports.submitEvaluation = async (req, res) => {
 
     const addEvaluation = await TeacherEvaluation.create({
       type,
-      teacher_id,
+      trainer_id,
       employee_id,
       first_result,
       second_result,

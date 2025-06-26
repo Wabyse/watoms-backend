@@ -28,10 +28,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -43,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     CurriculumResult.associate = (models) => {
-        CurriculumResult.belongsTo(models.Question, { foreignKey: 'question_id', as: 'questionResult' });
+        CurriculumResult.belongsTo(models.Question, { foreignKey: 'question_id', as: 'question' });
         CurriculumResult.belongsTo(models.CurriculumReport, { foreignKey: 'report_id', as: 'report' });
     };
 

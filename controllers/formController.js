@@ -1,21 +1,19 @@
-const jwt = require("jsonwebtoken");
 const {
-  User,
   IndividualReport,
-  QuestionResult,
+  IndividualResult,
+  CurriculumReport,
+  CurriculumResult,
+  EnvironmentReport,
+  EnvironmentResult,
+  CourseReport,
+  CourseResult,
+  FacilityReport,
+  FacilityResult,
+  User,
   Question,
   Field,
   Form,
-  CurriculumReport,
-  CurriculumResult,
-  Curriculum,
   SubField,
-  Department,
-  Employee,
-  Teacher,
-  Organization,
-  EnvironmentReports,
-  EnvironmentResults,
 } = require("../db/models");
 require("dotenv").config();
 
@@ -30,20 +28,20 @@ const insertForm = async (req, res) => {
     }
 
     const result = await User.sequelize.transaction(async (transaction) => {
-      const form = await IndividualReport.create(
+      const report = await IndividualReport.create(
         {
-          Assessor_id: assessor,
-          Assessee_id: assessee,
+          assessor_id: assessor,
+          assessee_id: assessee,
         },
         { transaction }
       );
       const answers = questionsResult.map((question) => ({
         score: question.result,
         question_id: question.question_id,
-        report_id: form.id,
+        report_id: report.id,
       }));
-      await QuestionResult.bulkCreate(answers, { validate: true, transaction });
-      return { form, answers };
+      await IndividualResult.bulkCreate(answers, { validate: true, transaction });
+      return { report, answers };
     });
     res
       .status(201)
@@ -64,9 +62,9 @@ const insertCurriculumForm = async (req, res) => {
     }
 
     const result = await User.sequelize.transaction(async (transaction) => {
-      const form = await CurriculumReport.create(
+      const report = await CurriculumReport.create(
         {
-          Assessor_id: userId,
+          user_id: userId,
           curriculum_id: curriculumId,
           organization_id
         },
@@ -75,13 +73,13 @@ const insertCurriculumForm = async (req, res) => {
       const answers = questionsResult.map((question) => ({
         score: question.result,
         question_id: question.question_id,
-        report_id: form.id,
+        report_id: report.id,
       }));
       await CurriculumResult.bulkCreate(answers, {
         validate: true,
         transaction,
       });
-      return { form, answers };
+      return { report, answers };
     });
     res
       .status(201)
@@ -102,7 +100,7 @@ const insertEnvForm = async (req, res) => {
     }
 
     const result = await User.sequelize.transaction(async (transaction) => {
-      const form = await EnvironmentReports.create(
+      const report = await EnvironmentReport.create(
         {
           user_id: userId,
           organization_id
@@ -112,13 +110,87 @@ const insertEnvForm = async (req, res) => {
       const answers = questionsResult.map((question) => ({
         score: question.result,
         question_id: question.question_id,
-        report_id: form.id,
+        report_id: report.id,
       }));
-      await EnvironmentResults.bulkCreate(answers, {
+      await EnvironmentResult.bulkCreate(answers, {
         validate: true,
         transaction,
       });
-      return { form, answers };
+      return { report, answers };
+    });
+    res
+      .status(201)
+      .json({ message: "form inserted successfully", result, questionsResult });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+const insertCourseForm = async (req, res) => {
+  try {
+    const { userId, course_offering_id, questionsResult } = req.body;
+    if (!userId || !course_offering_id || !questionsResult) {
+      return res.status(400).json({
+        status: "fail",
+        message: "All fields are required",
+      });
+    }
+
+    const result = await User.sequelize.transaction(async (transaction) => {
+      const report = await CourseReport.create(
+        {
+          user_id: userId,
+          course_offering_id,
+        },
+        { transaction }
+      );
+      const answers = questionsResult.map((question) => ({
+        score: question.result,
+        question_id: question.question_id,
+        report_id: report.id,
+      }));
+      await CourseResult.bulkCreate(answers, {
+        validate: true,
+        transaction,
+      });
+      return { report, answers };
+    });
+    res
+      .status(201)
+      .json({ message: "form inserted successfully", result, questionsResult });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+const insertFacilityForm = async (req, res) => {
+  try {
+    const { userId, facility_id, questionsResult } = req.body;
+    if (!userId || !facility_id || !questionsResult) {
+      return res.status(400).json({
+        status: "fail",
+        message: "All fields are required",
+      });
+    }
+
+    const result = await User.sequelize.transaction(async (transaction) => {
+      const report = await FacilityReport.create(
+        {
+          user_id: userId,
+          facility_id,
+        },
+        { transaction }
+      );
+      const answers = questionsResult.map((question) => ({
+        score: question.result,
+        question_id: question.question_id,
+        report_id: report.id,
+      }));
+      await FacilityResult.bulkCreate(answers, {
+        validate: true,
+        transaction,
+      });
+      return { report, answers };
     });
     res
       .status(201)
@@ -142,8 +214,7 @@ const fetchForm = async (req, res) => {
     const data = await Question.findAll({
       attributes: [
         ["id", "question_id"],
-        ["en_name", "question_en_name"],
-        ["ar_name", "question_ar_name"],
+        ["name", "question_name"],
         ["weight", "question_weight"],
         ["max_score", "question_max_score"],
       ],
@@ -154,8 +225,7 @@ const fetchForm = async (req, res) => {
           required: true,
           attributes: [
             ["id", "sub_field_id"],
-            ["en_name", "sub_field_en_name"],
-            ["ar_name", "sub_field_ar_name"],
+            ["name", "sub_field_name"],
             ["weight", "sub_field_weight"],
             "field_id",
           ],
@@ -166,8 +236,7 @@ const fetchForm = async (req, res) => {
               required: true,
               attributes: [
                 ["id", "field_id"],
-                ["en_name", "field_en_name"],
-                ["ar_name", "field_ar_name"],
+                ["name", "field_name"],
                 ["weight", "field_weight"],
                 "form_id",
               ],
@@ -177,9 +246,11 @@ const fetchForm = async (req, res) => {
                   as: "form",
                   required: true,
                   attributes: [
-                    ["weight", "form_weight"],
+                    ["id", "form_id"],
+                    ["name", "form_name"],
+                    ["code", "form_code"],
                     ["type", "form_type"],
-                    ["code", "form_code"]
+                    ["weight", "form_weight"],
                   ],
                   where: { id: formId },
                 },
@@ -204,7 +275,7 @@ const fetchForm = async (req, res) => {
 const fetchAllForms = async (req, res) => {
   try {
     const data = await Form.findAll({
-      attributes: ["id", "en_name", "ar_name", "code", "type"],
+      attributes: ["id", "name", "code", "type"],
     });
     res.status(200).json({
       status: "success",
@@ -212,103 +283,6 @@ const fetchAllForms = async (req, res) => {
       data,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-const fetchAllCurriculums = async (req, res) => {
-  try {
-    const data = await Curriculum.findAll({
-      attributes: ["id", "code"],
-    });
-    res.status(200).json({
-      status: "success",
-      message: "data got fetched successfully",
-      data,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-const fetchAllDepartments = async (req, res) => {
-  try {
-    const data = await Department.findAll({
-      attributes: ["id", "Name"],
-    });
-    res.status(200).json({
-      status: "success",
-      message: "data got fetched successfully",
-      data,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-const fetchAllUsers = async (req, res) => {
-  try {
-    const { userId, departmentId } = req.query;
-
-    const data = await User.findAll({
-      where: userId ? { id: userId } : {},
-      attributes: ["id", "code"],
-      include: [
-        {
-          model: Employee,
-          as: "employee",
-          required: true,
-          attributes: [
-            ["id", "employee_id"],
-            ["first_name", "employee_first_name"],
-            ["middle_name", "employee_middle_name"],
-            ["last_name", "employee_last_name"],
-            "organization_id",
-          ],
-          include: [
-            {
-              model: Teacher,
-              as: "teacher",
-              attributes: ["department_id"],
-              include: [
-                {
-                  model: Department,
-                  as: "department",
-                  required: true,
-                  attributes: [["Name", "department_name"]],
-                  where: departmentId ? { id: departmentId } : {},
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "Data fetched successfully",
-      data,
-    });
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-const fetchAllOrgs = async (req, res) => {
-  try {
-    const data = await Organization.findAll({
-      attributes: ["id", "name", "type"],
-    });
-
-    res.status(200).json({
-      status: "success",
-      message: "Data fetched successfully",
-      data,
-    });
-  } catch (error) {
-    console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
@@ -318,9 +292,7 @@ module.exports = {
   fetchForm,
   fetchAllForms,
   insertCurriculumForm,
-  fetchAllCurriculums,
-  fetchAllDepartments,
-  fetchAllUsers,
-  fetchAllOrgs,
-  insertEnvForm
+  insertEnvForm,
+  insertCourseForm,
+  insertFacilityForm,
 };

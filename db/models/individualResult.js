@@ -1,25 +1,29 @@
 module.exports = (sequelize, DataTypes) => {
-    const EnvironmentReport = sequelize.define('EnvironmentReport', {
+    const IndividualResult = sequelize.define('IndividualResult', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        user_id: {
+        score: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        question_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'users',
+                model: 'questions',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
         },
-        organization_id: {
+        report_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'organizations',
+                model: 'individual_reports',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
@@ -29,16 +33,15 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {
         paranoid: true,
-        tableName: 'environment_reports',
+        tableName: 'individuals_results',
         timestamps: true,
         updatedAt: false,
     });
 
-    EnvironmentReport.associate = (models) => {
-        EnvironmentReport.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
-        EnvironmentReport.hasMany(models.EnvironmentResult, { foreignKey: 'report_id', as: 'results' });
-        EnvironmentReport.belongsTo(models.Organization, { foreignKey: 'organization_id', as: 'organization' });
+    IndividualResult.associate = (models) => {
+        IndividualResult.belongsTo(models.Question, { foreignKey: 'question_id', as: 'question' });
+        IndividualResult.belongsTo(models.IndividualReport, { foreignKey: 'report_id', as: 'report' });
     };
 
-    return EnvironmentReport;
+    return IndividualResult;
 }

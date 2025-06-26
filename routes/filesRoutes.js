@@ -7,10 +7,8 @@ const { authenticateToken } = require("../middleware/authMiddleware");
 router.post("/upload", upload.single("file"), fileController.uploadFile);
 router.get("/download/*", fileController.downloadFile);
 router.get("/view", authenticateToken, fileController.viewFiles);
-// router.get("/view", fileController.viewFiles);
 router.get("/open/:filename", fileController.openFile);
-router.post("/send/:filename", fileController.sendFile);
+router.post("/send/:filename", fileController.sendFile); //still under development
 router.get("/categories", authenticateToken, fileController.viewCategories);
-// router.get("/categories", fileController.viewCategories);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Student = sequelize.define('Student', {
+    const Trainee = sequelize.define('Trainee', {
         id: {
             allowNull: false,
             autoIncrement: true,
@@ -33,25 +33,16 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        class_id: {
+        course_offering_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'classes',
+                model: 'course_offerings',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
         },
-        specialization_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'specializations',
-                key: 'id',
-            },
-            onDelete: 'RESTRICT'
-        },
-        school_id: {
+        organization_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -60,28 +51,23 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'students',
+        tableName: 'trainees',
         timestamps: true,
         updatedAt: false,
     });
 
-    Student.associate = (models) => {
-        Student.hasMany(models.QuizTest, { foreignKey: 'student_id', as: 'quizzes' });
-        Student.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
-        Student.belongsTo(models.Class, { foreignKey: 'class_id', as: 'class' });
-        Student.belongsTo(models.Specialization, { foreignKey: 'specialization_id', as: 'specialization' });
-        Student.belongsTo(models.Organization, { foreignKey: 'school_id', as: 'school' });
-        Student.hasMany(models.studentAttendance, { foreignKey: 'student_id', as: 'attendance' });
+    Trainee.associate = (models) => {
+        Trainee.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
+        Trainee.belongsTo(models.CourseOffering, { foreignKey: 'course_offering_id', as: 'course' });
+        Trainee.belongsTo(models.Organization, { foreignKey: 'organization_id', as: 'institution' });
+        Trainee.hasMany(models.QuizTest, { foreignKey: 'trainee_id', as: 'quizzes' });
+        Trainee.hasMany(models.TraineeAttendance, { foreignKey: 'trainee_id', as: 'attendance' });
     };
 
-    return Student;
+    return Trainee;
 }

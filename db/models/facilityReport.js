@@ -1,47 +1,44 @@
 module.exports = (sequelize, DataTypes) => {
-    const SubjectSpecialization = sequelize.define('SubjectSpecialization', {
+    const FacilityReport = sequelize.define('FacilityReport', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        subject_id: {
+        user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'subjects',
+                model: 'users',
                 key: 'id',
             },
-            onDelete: 'RESTRICT'
+            onDelete: 'RESTRICT',
         },
-        specialization_id: {
+        facility_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'specializations',
+                model: 'curriculums',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'subjectSpecialization',
+        tableName: 'facilities_reports',
         timestamps: true,
         updatedAt: false,
     });
 
-    SubjectSpecialization.associate = (models) => {
-        SubjectSpecialization.belongsTo(models.Subject, { foreignKey: 'subject_id', as: 'subject' });
-        SubjectSpecialization.belongsTo(models.Specialization, { foreignKey: 'specialization_id', as: 'specialization' });
+    FacilityReport.associate = (models) => {
+        FacilityReport.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
+        FacilityReport.belongsTo(models.Facility, { foreignKey: 'facility_id', as: 'facility' });
+        FacilityReport.hasMany(models.FacilityResult, { foreignKey: 'report_id', as: 'results' });
     };
 
-    return SubjectSpecialization;
+    return FacilityReport;
 }

@@ -37,8 +37,8 @@ exports.assignTask = async (req, res) => {
       start_date,
       end_date,
       importance,
-      sub_category,
-      assignedBy_id,
+      sub_category_id,
+      assignedby_id,
       assignee_id,
     } = req.body;
 
@@ -49,8 +49,8 @@ exports.assignTask = async (req, res) => {
       !start_date ||
       !end_date ||
       !importance ||
-      !sub_category ||
-      !assignedBy_id ||
+      !sub_category_id ||
+      !assignedby_id ||
       !assignee_id
     ) {
       return res.status(400).json({ message: "All fields are required" });
@@ -70,8 +70,8 @@ exports.assignTask = async (req, res) => {
       end_date,
       status: "not started yet",
       importance,
-      sub_category,
-      assignedBy_id,
+      sub_category_id,
+      assignedby_id,
       assignee_id,
       file_path, // Will be null if no file is uploaded
     });

@@ -15,16 +15,19 @@ module.exports = (sequelize, DataTypes) => {
         file_path: {
             type: DataTypes.TEXT
         },
-        school_id: {
+        incident_date: {
+            type: DataTypes.DATE,
+        },
+        institution_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'schools',
+                model: 'institutions',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
         },
-        sub_category: {
+        sub_category_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -32,13 +35,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        incident_date: {
-            type: DataTypes.DATE,
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
@@ -51,8 +47,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Incident.associate = (models) => {
-        Incident.belongsTo(models.School, { foreignKey: 'school_id', as: 'school' });
-        Incident.belongsTo(models.IncidentSubCategory, { foreignKey: 'sub_category', as: 'incidentSubCategory' });
+        Incident.belongsTo(models.Institution, { foreignKey: 'institution_id', as: 'institution' });
+        Incident.belongsTo(models.IncidentSubCategory, { foreignKey: 'sub_category_id', as: 'sub_category' });
     };
 
     return Incident;

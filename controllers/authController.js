@@ -3,15 +3,13 @@ const jwt = require("jsonwebtoken");
 const {
   User,
   Employee,
-  Teacher,
+  Trainer,
   UserRole,
   Organization,
-  Student,
+  Trainee,
   EmployeeRole,
-  Department,
-  AdminsUsers,
-  Class,
-  Specialization
+  Course,
+  CourseOffering
 } = require("../db/models");
 const { comparePassword, hashPassword } = require("../utils/hashPassword");
 require("dotenv").config();
@@ -31,11 +29,10 @@ const login = async (req, res) => {
     const userRole = await UserRole.findOne({ where: { id: user.role_id } });
 
     let organization = null;
-    let department = null; // Declare organization outside the if block
     let employeeRole = null;
     let employee = null;
 
-    if (userRole.title !== "Student") {
+    if (userRole.title !== "Trainee") {
       employee = await Employee.findOne({ where: { user_id: user.id } });
       if (employee) {
         organization = await Organization.findOne({
@@ -45,19 +42,16 @@ const login = async (req, res) => {
       employeeRole = await EmployeeRole.findOne({
         where: { id: employee.role_id },
       });
-      if (employeeRole && (employeeRole.title === "Teacher" || employeeRole.title === "HOD")) {
-        const teacher = await Teacher.findOne({
+      if (employeeRole && (employeeRole.title === "Trainer")) {
+        const trainer = await Trainer.findOne({
           where: { employee_id: employee.id },
-        });
-        department = await Department.findOne({
-          where: { id: teacher.department_id },
         });
       }
     } else {
-      const student = await Student.findOne({ where: { user_id: user.id } });
-      if (student) {
+      const trainee = await Trainee.findOne({ where: { user_id: user.id } });
+      if (trainee) {
         organization = await Organization.findOne({
-          where: { id: student.school_id },
+          where: { id: trainee.organization_id },
         });
       }
     }
@@ -76,7 +70,6 @@ const login = async (req, res) => {
       id: user.id,
       code: user.code,
       organization_id: organization ? organization.id : null,
-      department_id: department ? department.id : null,
       user_role: userRole.title,
       employee_id: employee ? employee.id : null,
       employee_role: employeeRole ? employeeRole.title : null,
@@ -98,11 +91,9 @@ const signup = async (req, res) => {
       organization_id,
       emp_role_id,
       password,
-      planned_sessions,
-      subject_id,
-      department_id,
-      class_id,
-      specialization_id,
+      course_id,
+      course_offering_id,
+      trainer_type,
     } = req.body;
 
     // Normalize and validate email
@@ -152,26 +143,25 @@ const signup = async (req, res) => {
         { transaction }
       );
 
-      if (Role.title === "Student") {
-        if (!class_id || !specialization_id) {
+      if (Role.title === "trainee") {
+        if (!course_offering_id) {
           throw new Error("Missing class or specialization");
         }
 
-        const student = await Student.create(
+        const trainee = await Trainee.create(
           {
             first_name,
             middle_name,
             last_name,
             email: normalizedEmail,
             user_id: user.id,
-            class_id,
-            specialization_id,
-            school_id: organization_id,
+            course_offering_id,
+            organization_id,
           },
           { transaction }
         );
 
-        return { user, student };
+        return { user, trainee };
       } else {
         if (!emp_role_id) {
           throw new Error("Missing employee role ID");
@@ -190,26 +180,24 @@ const signup = async (req, res) => {
           { transaction }
         );
 
-        let teacher = null;
+        let trainer = null;
         if (
-          Role.title === "Teacher" ||
-          Role.title === "Head of Department (HOD)"
+          Role.title === "Trainer"
         ) {
-          if (!planned_sessions || !subject_id || !department_id) {
-            throw new Error("Missing teacher details");
+          if (!trainer_type || !course_id) {
+            throw new Error("Missing trainer details");
           }
-          teacher = await Teacher.create(
+          trainer = await Trainer.create(
             {
-              planned_sessions,
+              type: trainer_type,
               employee_id: employee.id,
-              subject_id,
-              department_id,
+              course_id,
             },
             { transaction }
           );
         }
 
-        return { user, employee, teacher: teacher || null };
+        return { user, employee, trainer: trainer || null };
       }
     });
 
@@ -263,11 +251,9 @@ const signupBulk = async (req, res) => {
           organization_id,
           emp_role_id,
           password,
-          planned_sessions,
-          subject_id,
-          department_id,
-          class_id,
-          specialization_id,
+          course_id,
+          course_offering_id,
+          trainer_type,
         } = userData;
 
         const normalizedEmail = email?.toLowerCase().trim();
@@ -322,45 +308,37 @@ const signupBulk = async (req, res) => {
           code: user.code,
           password,
           organization: organization?.name || null,
-          class: null,
-          specialization: null,
+          course_offering: null,
         };
 
-        if (Role.title === "Student") {
-          if (!class_id || !specialization_id) {
-            throw new Error(`Missing class/specialization for student: ${email}`);
+        if (Role.title === "Trainee") {
+          if (!course_offering_id) {
+            throw new Error(`Missing course offering for trainee: ${email}`);
           }
 
-          await Student.create(
+          await Trainee.create(
             {
               first_name,
               middle_name,
               last_name,
               email: normalizedEmail,
               user_id: user.id,
-              class_id,
-              specialization_id,
-              school_id: organization_id,
+              course_offering_id,
+              organization_id,
             },
             { transaction }
           );
 
           // Get class and specialization names
-          const classObj = await Class.findByPk(class_id, {
+          const courseOfferingObj = await CourseOffering.findByPk(course_offering_id, {
             attributes: ['name'],
             transaction,
           });
 
-          const specialization = await Specialization.findByPk(specialization_id, {
-            attributes: ['name'],
-            transaction,
-          });
-
-          outputData.class = classObj?.name || null;
-          outputData.specialization = specialization?.name || null;
+          outputData.course_offering = courseOfferingObj?.name || null;
         } else {
           if (!emp_role_id) {
-            throw new Error(`Missing employee role ID for: ${email}`);
+            throw new Error(`Missing employee role ID`);
           }
 
           const employee = await Employee.create(
@@ -376,20 +354,16 @@ const signupBulk = async (req, res) => {
             { transaction }
           );
 
-          if (
-            Role.title === "Teacher" ||
-            Role.title === "Head of Department (HOD)"
-          ) {
-            if (!planned_sessions || !subject_id || !department_id) {
-              throw new Error(`Missing teacher details for: ${email}`);
+          if (Role.title === "Trainer") {
+            if (!trainer_type || !course_id) {
+              throw new Error(`Missing trainer details`);
             }
 
-            await Teacher.create(
+            await Trainer.create(
               {
-                planned_sessions,
+                type: trainer_type,
                 employee_id: employee.id,
-                subject_id,
-                department_id,
+                course_id,
               },
               { transaction }
             );
@@ -411,100 +385,4 @@ const signupBulk = async (req, res) => {
   }
 };
 
-const adminSignup = async (req, res) => {
-  try {
-    const {
-      username,
-      password,
-      user_id,
-      role
-    } = req.body;
-
-    if (
-      !username ||
-      !user_id ||
-      !role ||
-      !password
-    ) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    const userCheck = await User.findOne({
-      where: { id: user_id },
-    });
-
-    if (!userCheck) {
-      return res.status(400).json({ message: "Invalid User Id" });
-    }
-
-    const hashedPassword = await hashPassword(password);
-
-    const existingAdmin = await AdminsUsers.findOne({ where: { username } });
-    if (existingAdmin) {
-      return res.status(409).json({ message: "Username already exists" });
-    }
-
-    const adminUser = await AdminsUsers.create(
-      {
-        username,
-        password: hashedPassword,
-        user_id,
-        role
-      }
-    );
-
-    if (!process.env.JWT_SECRET_POINTS) {
-      throw new Error("JWT_SECRET is not defined");
-    }
-
-    const token = jwt.sign({ id: adminUser.id }, process.env.JWT_SECRET_POINTS, {
-      expiresIn: "1h",
-    });
-
-    res.status(201).json({
-      message: "Admin created successfully",
-      id: adminUser.id,
-      username: adminUser.username,
-      role: adminUser.role,
-      token,
-    });
-  } catch (error) {
-    console.error("Signup Error:", error);
-    res.status(500).json({ message: error.message || "Server error" });
-  }
-};
-
-const adminLogin = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    const Admin = await AdminsUsers.findOne({ where: { username } });
-    if (!Admin) {
-      return res.status(401).json({ message: "Invalid username or password" });
-    }
-
-    const isMatch = await comparePassword(password, Admin.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid username or password" });
-    }
-
-    const token = jwt.sign({ id: Admin.id }, process.env.JWT_SECRET_POINTS, {
-      expiresIn: "1h",
-    });
-
-    res.status(200).json({
-      message: "Login successful",
-      id: Admin.id,
-      username: Admin.username,
-      user_role: Admin.role,
-      token,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-module.exports = { signup, login, adminSignup, adminLogin, signupBulk };
+module.exports = { signup, login, signupBulk };

@@ -19,11 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     type: {
       allowNull: false,
-      type: DataTypes.ENUM('school', 'company', 'government', 'other'),
-    },
-    deleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+      type: DataTypes.ENUM('institution', 'company', 'government', 'other'),
     },
     deletedAt: {
       type: DataTypes.DATE,
@@ -36,12 +32,12 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Organization.associate = (models) => {
+    Organization.hasOne(models.Institution, { foreignKey: 'organization_id', as: 'institution' });
+    Organization.hasMany(models.Document, { foreignKey: 'organization_id', as: 'documents' });
     Organization.hasMany(models.Employee, { foreignKey: 'organization_id', as: 'employees' });
-    Organization.hasOne(models.School, { foreignKey: 'organizationId', as: 'school' });
-    Organization.hasMany(models.Student, { foreignKey: 'school_id', as: 'students' });
-    Organization.hasMany(models.SchoolDocument, { foreignKey: 'organization_id', as: 'documents' });
-    Organization.hasMany(models.EnvironmentReports, { foreignKey: 'organization_id', as: 'envReports' });
-    Organization.hasMany(models.CurriculumReport, { foreignKey: 'organization_id', as: 'currReports' });
+    Organization.hasMany(models.Trainee, { foreignKey: 'organization_id', as: 'trainees' });
+    Organization.hasMany(models.EnvironmentReport, { foreignKey: 'organization_id', as: 'environment_reports' });
+    Organization.hasMany(models.CurriculumReport, { foreignKey: 'organization_id', as: 'curriculum_reports' });
   };
 
   return Organization;

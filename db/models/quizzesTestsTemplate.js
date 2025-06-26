@@ -18,11 +18,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.ENUM('test', 'quiz'),
         },
-        subject_id: {
+        course_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'subjects',
+                model: 'courses',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
 
     QuizzesTestsTemplate.associate = (models) => {
         QuizzesTestsTemplate.hasMany(models.QuizTest, { foreignKey: 'template_id', as: 'quizzes' });
-        QuizzesTestsTemplate.belongsTo(models.Subject, { foreignKey: 'subject_id', as: 'subject' });
+        QuizzesTestsTemplate.belongsTo(models.Course, { foreignKey: 'course_id', as: 'course' });
     };
 
     return QuizzesTestsTemplate;

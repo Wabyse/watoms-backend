@@ -10,10 +10,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -25,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     DocCategory.associate = (models) => {
-        DocCategory.hasMany(models.DocSubCategory, { foreignKey: 'category', as: 'subCategory' });
+        DocCategory.hasMany(models.DocSubCategory, { foreignKey: 'category_id', as: 'sub_category' });
     };
 
     return DocCategory;

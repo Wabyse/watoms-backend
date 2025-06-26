@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        category: {
+        category_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
@@ -34,8 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     TaskSubCategory.associate = (models) => {
-        TaskSubCategory.belongsTo(models.TaskCategory, { foreignKey: 'category', as: 'taskCategory' });
-        TaskSubCategory.hasMany(models.Task, { foreignKey: 'sub_category', as: 'tasks' });
+        TaskSubCategory.belongsTo(models.TaskCategory, { foreignKey: 'category_id', as: 'taskCategory' });
+        TaskSubCategory.hasMany(models.Task, { foreignKey: 'sub_category_id', as: 'tasks' });
     };
 
     return TaskSubCategory;

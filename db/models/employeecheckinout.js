@@ -22,15 +22,13 @@ module.exports = (sequelize, DataTypes) => {
         model: 'users',
         key: 'id'
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'SET NULL'
+      onDelete: 'RESTRICT'
     },
-    createdAt: {
-      allowNull: false,
+    deletedAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    }
+    },
   }, {
+    paranoid: true,
     tableName: 'employee_check_in_outs',
     timestamps: true,
     updatedAt: false,

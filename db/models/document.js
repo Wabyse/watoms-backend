@@ -1,60 +1,57 @@
 module.exports = (sequelize, DataTypes) => {
-    const Substitute = sequelize.define('Substitute', {
+    const Document = sequelize.define('Document', {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
-        substitute_id: {
+        file_path: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        sub_category_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'employees',
+                model: 'document_sub_categories',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
         },
-        replacement_id: {
+        user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'employees',
+                model: 'users',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
         },
-        session_id: {
+        organization_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'sessions',
+                model: 'organizations',
                 key: 'id',
             },
             onDelete: 'RESTRICT'
-        },
-        reason: {
-            type: DataTypes.STRING
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,
         },
     }, {
         paranoid: true,
-        tableName: 'substitutes',
+        tableName: 'documents',
         timestamps: true,
         updatedAt: false,
     });
 
-    Substitute.associate = (models) => {
-        Substitute.belongsTo(models.Employee, { foreignKey: 'substitute_id', as: 'substitute' });
-        Substitute.belongsTo(models.Employee, { foreignKey: 'replacement_id', as: 'replacement' });
-        Substitute.belongsTo(models.Session, { foreignKey: 'session_id', as: 'session' });
+    Document.associate = (models) => {
+        Document.belongsTo(models.DocSubCategory, { foreignKey: 'sub_category_id', as: 'documentSubCategory' });
+        Document.belongsTo(models.User, { foreignKey: 'user_id', as: 'uploader' });
+        Document.belongsTo(models.Organization, { foreignKey: 'organization_id', as: 'organization' });
     };
 
-    return Substitute;
+    return Document;
 }

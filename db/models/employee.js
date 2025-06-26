@@ -28,8 +28,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING
         },
         email: {
-            type: DataTypes.STRING,
-            allowNull: false
+            type: DataTypes.STRING
         },
         role_id: {
             type: DataTypes.INTEGER,
@@ -58,10 +57,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },
@@ -69,21 +64,16 @@ module.exports = (sequelize, DataTypes) => {
         paranoid: true,
         tableName: 'employees',
         timestamps: true,
-        updatedAt: false,
     });
     
     Employee.associate = (models) => {
         Employee.belongsTo(models.EmployeeRole, { foreignKey: 'role_id', as: 'role' });
         Employee.belongsTo(models.Organization, { foreignKey: 'organization_id', as: 'organization' });
         Employee.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
-        Employee.hasMany(models.EmployeeAbsence, { foreignKey: 'employee_id', as: 'absences' });
-        Employee.hasMany(models.Substitute, { foreignKey: 'substitute_id', as: 'replacement' });
-        Employee.hasMany(models.Substitute, { foreignKey: 'replacement_id', as: 'substitute' });
-        Employee.hasMany(models.Task, { foreignKey: 'assignedBy_id', as: 'assigner_tasks' });
+        Employee.hasMany(models.Task, { foreignKey: 'assignedby_id', as: 'assigner_tasks' });
         Employee.hasMany(models.Task, { foreignKey: 'assignee_id', as: 'assignee_tasks' });
-        Employee.hasOne(models.Teacher, { foreignKey: 'employee_id', as: 'teacher' });
-        Employee.hasMany(models.WorkLatness, { foreignKey: 'emp_id', as: 'latness' });
-        Employee.hasMany(models.TeacherEvaluation, { foreignKey: 'employee_id', as: 'evaluates' });
+        Employee.hasOne(models.Trainer, { foreignKey: 'employee_id', as: 'trainer' });
+        Employee.hasMany(models.TrainerEvaluation, { foreignKey: 'employee_id', as: 'evaluates' });
     };
 
     return Employee;
