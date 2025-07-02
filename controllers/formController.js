@@ -214,7 +214,7 @@ const fetchForm = async (req, res) => {
     const data = await Question.findAll({
       attributes: [
         ["id", "question_id"],
-        ["name", "question_name"],
+        ["ar_name", "question_ar_name"],
         ["weight", "question_weight"],
         ["max_score", "question_max_score"],
       ],
@@ -225,7 +225,7 @@ const fetchForm = async (req, res) => {
           required: true,
           attributes: [
             ["id", "sub_field_id"],
-            ["name", "sub_field_name"],
+            ["ar_name", "sub_field_ar_name"],
             ["weight", "sub_field_weight"],
             "field_id",
           ],
@@ -236,7 +236,7 @@ const fetchForm = async (req, res) => {
               required: true,
               attributes: [
                 ["id", "field_id"],
-                ["name", "field_name"],
+                ["ar_name", "field_ar_name"],
                 ["weight", "field_weight"],
                 "form_id",
               ],
@@ -247,7 +247,7 @@ const fetchForm = async (req, res) => {
                   required: true,
                   attributes: [
                     ["id", "form_id"],
-                    ["name", "form_name"],
+                    ["ar_name", "form_ar_name"],
                     ["code", "form_code"],
                     ["type", "form_type"],
                     ["weight", "form_weight"],
@@ -275,7 +275,7 @@ const fetchForm = async (req, res) => {
 const fetchAllForms = async (req, res) => {
   try {
     const data = await Form.findAll({
-      attributes: ["id", "name", "code", "type"],
+      attributes: ["id", "ar_name", "code", "type"],
     });
     res.status(200).json({
       status: "success",

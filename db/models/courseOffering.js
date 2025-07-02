@@ -6,6 +6,12 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             type: DataTypes.INTEGER,
         },
+        planned_hours: {
+            type: DataTypes.INTEGER
+        },
+        finished_hours: {
+            type: DataTypes.INTEGER
+        },
         course_id: {
             type: DataTypes.INTEGER,
             allowNull: false,

@@ -27,10 +27,6 @@ module.exports = (sequelize, DataTypes) => {
             },
             onDelete: 'RESTRICT'
         },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
         deletedAt: {
             type: DataTypes.DATE,
         },

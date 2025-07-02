@@ -31,6 +31,7 @@ const login = async (req, res) => {
     let organization = null;
     let employeeRole = null;
     let employee = null;
+    let trainee = null;
 
     if (userRole.title !== "Trainee") {
       employee = await Employee.findOne({ where: { user_id: user.id } });
@@ -48,7 +49,7 @@ const login = async (req, res) => {
         });
       }
     } else {
-      const trainee = await Trainee.findOne({ where: { user_id: user.id } });
+      trainee = await Trainee.findOne({ where: { user_id: user.id } });
       if (trainee) {
         organization = await Organization.findOne({
           where: { id: trainee.organization_id },
@@ -71,6 +72,7 @@ const login = async (req, res) => {
       code: user.code,
       organization_id: organization ? organization.id : null,
       user_role: userRole.title,
+      user_name: employee ? `${employee.first_name} ${employee.middle_name} ${employee.last_name}` : `${trainee.first_name} ${trainee.middle_name} ${trainee.last_name}`,
       employee_id: employee ? employee.id : null,
       employee_role: employeeRole ? employeeRole.title : null,
       token,

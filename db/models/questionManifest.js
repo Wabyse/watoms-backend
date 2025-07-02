@@ -5,17 +5,17 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             type: DataTypes.STRING,
         },
-        name: {
+        en_name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        ar_name: {
             type: DataTypes.STRING,
             allowNull: false,
         },
         weight: {
             type: DataTypes.INTEGER,
             allowNull: false,
-        },
-        deleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         },
         deletedAt: {
             type: DataTypes.DATE,

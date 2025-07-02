@@ -4,7 +4,7 @@ const { authenticateToken } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", authenticateToken, fetchForm);
+router.post("/", authenticateToken, fetchForm);
 router.get("/AllForms", authenticateToken, fetchAllForms);
 router.post("/individualReports", authenticateToken, insertForm);
 router.post("/curriculumReports", authenticateToken, insertCurriculumForm);
